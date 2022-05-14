@@ -1,0 +1,75 @@
+import PIL
+from PIL import Image, ImageDraw, ImageFont
+
+#'STORAGE' LIST FOR CREATED IMAGES
+images=[0,1,2,3,4,5,6,7,8]
+incomplete_images=[0,1,2,3,4,5,6,7,8]
+
+#READ IMAGE, CONVERT TO RGB AND COPY
+i=Image.open(input('type image path name and type (eg: /Users/Yourname/Pictures/test_img.jpg): '))
+i=i.convert('RGB')
+ci=i.copy()
+
+#GET A FONT
+try:
+    f=ImageFont.truetype('/Library/Courier.ttc', ci.width//15)
+except OSError:
+    try:
+        f=ImageFont.truetype(input('Please type path and name for font (eg: /Library/Courier.ttc): ')+',ci.width//15')
+    except OSError or AttributeError:
+        print("That didn't work. I'll attempt one more before quitting. Wish us luck!")
+        f=ImageFont.truetype('/System/Library/Fonts/Supplemental/Arial.ttf', ci.width//15)
+
+#CREATE TEXT ITERABLES
+ch=['channel R intensity 0.1',
+    'channel R intensity 0.5',
+    'channel R intensity 0.9',
+    'channel G intensity 0.1',
+    'channel G intensity 0.5',
+    'channel G intensity 0.9',
+    'channel B intensity 0.1',
+    'channel B intensity 0.5',
+    'channel B intensity 0.9'
+   ]
+
+#CREATE TEXT BLOCK, ADD TO COPIED IMAGE AND APPLY INDIVIDUAL TEXT
+for num in range(9):
+    b=Image.new('RGB', (ci.width, ci.height//11), (0, 0, 0))
+    ci_b=Image.new('RGB', (ci.width, ci.height+b.height))
+    ci_b.paste(ci, (0, 0))
+    ci_b.paste(b, (0, ci.height))
+    ImageDraw.Draw(ci_b).text((ci.width//70, ci.height+ci.height//1500), ch[num], (255, 255, 255), f)
+    incomplete_images[num]=ci_b
+
+#APPLY HUE TO FULL IMAGES
+for i,pic in enumerate(incomplete_images):
+    r, g, b= pic.split()
+    bands=[(r.point(lambda x: x //10), g, b),
+       (r.point(lambda x: x //2), g, b),
+       (r.point(lambda x: (x //10)*9), g, b),
+       (r, g.point(lambda x: x //10), b),
+       (r, g.point(lambda x: x //2), b),
+       (r, g.point(lambda x: (x //10)*9), b),
+       (r, g, b.point(lambda x: x //10)),
+       (r, g, b.point(lambda x: x //2)),
+       (r, g, b.point(lambda x: (x //10)*9))
+      ]
+    images[i]=Image.merge('RGB', bands[i])
+
+#CREATE NEW SPREADSHEET
+##THIS SECTION OF CODE WAS PROVIDED BY THE WONDERFUL COMP-SCI INSTRUCTORS AT -UNIV of MICHIGAN-
+first_image=images[0]
+contact_sheet=PIL.Image.new(first_image.mode, (first_image.width*3,first_image.height*3))
+x=0
+y=0
+
+for img in images:
+    contact_sheet.paste(img, (x, y))
+    if x+first_image.width == contact_sheet.width:
+        x=0
+        y=y+first_image.height
+    else:
+        x=x+first_image.width
+contact_sheet = contact_sheet.resize((int(contact_sheet.width/2),int(contact_sheet.height/2) ))
+
+contact_sheet.show()
