@@ -1,4 +1,3 @@
 # 1image-9hues.py
-Through PIL, Pytesseract, OpenCV, Numpy and ZipFile. . .
-Parse through zip files to grab readable text and facial images.
-Through a search function, display all faces of particular files which contain the search keyword.
+Through PIL, Numpy and OpenCV. . .
+Change and display an image in three ranges for each of the three hues (RGB).
